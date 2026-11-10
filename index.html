@@ -38,7 +38,7 @@
     <div>
       <div class="hero-deck" id="heroDeck" role="button" tabindex="0" aria-label="Kanji flashcards. Press to flip the top card.">
         <div class="slot p0"><div class="flip">
-          <div class="face front"><div><div class="k">学</div><div class="r">がく</div></div></div>
+          <div class="face front"><div><div class="k">学</div><div class="r">まな.ぶ</div></div></div>
           <div class="face back"><div><span class="m">Study</span><span class="lv">N5</span></div></div>
         </div></div>
       </div>
@@ -69,9 +69,9 @@
         <div class="island"></div>
         <div class="sp"><b>Vocab</b><b>Verbs</b><b class="on">Kanji</b><b>Grammar</b></div>
         <div class="tiles">
-          <div class="tile">日<small>にち・ひ</small></div><div class="tile">水<small>すい・みず</small></div>
-          <div class="tile">学<small>がく・まなぶ</small></div><div class="tile">山<small>さん・やま</small></div>
-          <div class="tile">食<small>しょく・たべる</small></div><div class="tile">人<small>じん・ひと</small></div>
+          <div class="tile">日<small>ひ</small></div><div class="tile">水<small>みず</small></div>
+          <div class="tile">学<small>まな.ぶ</small></div><div class="tile">山<small>やま</small></div>
+          <div class="tile">食<small>た.べる</small></div><div class="tile">人<small>ひと</small></div>
         </div>
       </div>
     </div>
@@ -138,11 +138,11 @@
     <figure class="stand" style="margin:0">
       <div class="deck">
         <button class="flip" id="standCard" type="button" aria-label="Standby flashcard. Press to flip.">
-          <div class="face front"><div><div class="k">食</div><div class="r">しょく</div></div></div>
+          <div class="face front"><div><div class="k">食</div><div class="r">た.べる・く.う</div></div></div>
           <div class="face back">
             <div><span class="m">Eat, food</span><span class="lv">N5</span></div>
             <div class="row"><b>音</b>ショク</div>
-            <div class="row"><b>訓</b>た-べる</div>
+            <div class="row"><b>訓</b>た.べる・く.う</div>
             <ul><li><span class="w">食事</span><span class="y">しょくじ</span><span class="e">meal</span></li></ul>
             <div class="sent"><span>朝ご飯を食べます。</span><small>I eat breakfast.</small></div>
           </div>
@@ -170,16 +170,16 @@
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var deck = [
-    {k:'学',r:'がく',m:'Study',on:'ガク',kun:'まな-ぶ',ex:[['学校','がっこう','school'],['大学','だいがく','university']],s:'毎日学校で日本語を学びます。',t:'I study Japanese at school every day.'},
-    {k:'水',r:'すい',m:'Water',on:'スイ',kun:'みず',ex:[['水曜日','すいようび','Wednesday'],['水道','すいどう','water supply']],s:'冷たい水を飲みます。',t:'I drink cold water.'},
-    {k:'山',r:'さん',m:'Mountain',on:'サン',kun:'やま',ex:[['富士山','ふじさん','Mt. Fuji'],['登山','とざん','mountain climbing']],s:'高い山に登ります。',t:'I climb a tall mountain.'},
-    {k:'日',r:'にち',m:'Day, sun',on:'ニチ・ジツ',kun:'ひ・か',ex:[['日本','にほん','Japan'],['毎日','まいにち','every day']],s:'毎日日本語を勉強します。',t:'I study Japanese every day.'}
+    {k:'学',r:'まな.ぶ',m:'Study',on:'ガク',kun:'まな.ぶ',ex:[['学校','がっこう','school'],['大学','だいがく','university']],s:'毎日学校で日本語を学びます。',t:'I study Japanese at school every day.'},
+    {k:'水',r:'みず',m:'Water',on:'スイ',kun:'みず',ex:[['水曜日','すいようび','Wednesday'],['水道','すいどう','water supply']],s:'冷たい水を飲みます。',t:'I drink cold water.'},
+    {k:'山',r:'やま',m:'Mountain',on:'サン',kun:'やま',ex:[['富士山','ふじさん','Mt. Fuji'],['登山','とざん','mountain climbing']],s:'高い山に登ります。',t:'I climb a tall mountain.'},
+    {k:'日',r:'ひ・か',m:'Day, sun',on:'ニチ・ジツ',kun:'ひ・か',ex:[['日本','にほん','Japan'],['毎日','まいにち','every day']],s:'毎日日本語を勉強します。',t:'I study Japanese every day.'}
   ];
   var deckEl=document.getElementById('heroDeck'), dots=[].slice.call(document.querySelectorAll('#dots i'));
   function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
   function cardHTML(c){
     return '<div class="flip">'+
-      '<div class="face front"><div><div class="k">'+c.k+'</div><div class="r">'+c.r+'</div></div><div class="tap">Tap to flip</div></div>'+
+      '<div class="face front"><div><div class="k">'+c.k+'</div><div class="r">'+c.kun+'</div></div><div class="tap">Tap to flip</div></div>'+
       '<div class="face back"><div><span class="m">'+esc(c.m)+'</span><span class="lv">N5</span></div>'+
       '<div class="row"><b>音</b>'+c.on+'</div><div class="row"><b>訓</b>'+c.kun+'</div>'+
       '<ul>'+c.ex.map(function(e){return '<li><span class="w">'+e[0]+'</span><span class="y">'+e[1]+'</span><span class="e">'+esc(e[2])+'</span></li>';}).join('')+'</ul>'+
