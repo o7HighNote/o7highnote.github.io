@@ -136,7 +136,8 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
   .standby{padding:48px 24px;border-radius:28px}
   .pills{justify-content:flex-start}
   .phone{width:min(100%,250px)}
-  .hero::before{display:none}
+  .hero{position:relative}
+.hero::before{display:none}
 }
 @media(max-width:520px){.top nav a:first-child{display:none}.top nav a{margin-left:16px}}
 @media(prefers-reduced-motion:reduce){.flip{transition:none}.btn{transition:none}html{scroll-behavior:auto}}
@@ -146,12 +147,16 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
 .sent{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:2px}
 .sent span{font:700 20px var(--kanji)}.sent small{color:var(--ink2);font-size:14px}
 .stand .sent span{font-size:17px}
-/* stacked-deck look behind the hero card */
-.deck{position:relative}
-.hero .deck::before,.hero .deck::after{content:"";position:absolute;inset:0;border-radius:26px;border:1.5px solid var(--line);background:var(--paper);z-index:-1}
-.hero .deck::before{transform:rotate(5deg) translate(14px,6px)}
-.hero .deck::after{transform:rotate(-4deg) translate(-12px,8px)}
-.hero .deck{isolation:isolate}
-.hero{position:relative}
 .hero::before{content:"";position:absolute;right:-8%;top:-4%;width:58%;aspect-ratio:1;background:radial-gradient(closest-side,rgba(124,137,204,.28),rgba(124,137,204,0));z-index:-1;pointer-events:none}
 .pills span{transition:transform .15s}
+
+/* hero: a physical stack of cards */
+.hero-deck{position:relative;justify-self:center;width:min(100%,400px);aspect-ratio:4/5;cursor:pointer;border-radius:26px}
+.hero-deck .slot{position:absolute;inset:0;perspective:1400px;transition:transform .6s cubic-bezier(.3,.7,.2,1);will-change:transform}
+.hero-deck .flip{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto}
+.slot.p0{transform:none;z-index:4}
+.slot.p1{transform:translate(14px,8px) rotate(4deg);z-index:3}
+.slot.p2{transform:translate(-12px,12px) rotate(-3.5deg);z-index:2}
+.slot.p3{transform:translate(8px,18px) rotate(2deg);z-index:1}
+.slot.toss{transform:translate(82%,-8%) rotate(15deg);z-index:5;transition-duration:.5s;transition-timing-function:cubic-bezier(.5,0,.8,.6)}
+@media(prefers-reduced-motion:reduce){.hero-deck .slot{transition:none}}
