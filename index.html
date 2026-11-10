@@ -36,17 +36,11 @@
     </div>
 
     <div>
-      <div class="deck">
-        <button class="flip" id="heroCard" type="button" aria-live="polite" aria-label="Kanji flashcard. Press to flip.">
-          <div class="face front"><div><div class="k" data-f="k">学</div><div class="r" data-f="r">がく</div></div><div class="tap">Tap to flip</div></div>
-          <div class="face back">
-            <div><span class="m" data-f="m">Study</span><span class="lv">N5</span></div>
-            <div class="row"><b>音</b><span data-f="on">ガク</span></div>
-            <div class="row"><b>訓</b><span data-f="kun">まな-ぶ</span></div>
-            <ul data-f="ex"></ul>
-            <div class="sent"><span data-f="s"></span><small data-f="t"></small></div>
-          </div>
-        </button>
+      <div class="hero-deck" id="heroDeck" role="button" tabindex="0" aria-label="Kanji flashcards. Press to flip the top card.">
+        <div class="slot p0"><div class="flip">
+          <div class="face front"><div><div class="k">学</div><div class="r">がく</div></div></div>
+          <div class="face back"><div><span class="m">Study</span><span class="lv">N5</span></div></div>
+        </div></div>
       </div>
       <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
     </div>
@@ -181,30 +175,59 @@
     {k:'山',r:'さん',m:'Mountain',on:'サン',kun:'やま',ex:[['富士山','ふじさん','Mt. Fuji'],['登山','とざん','mountain climbing']],s:'高い山に登ります。',t:'I climb a tall mountain.'},
     {k:'日',r:'にち',m:'Day, sun',on:'ニチ・ジツ',kun:'ひ・か',ex:[['日本','にほん','Japan'],['毎日','まいにち','every day']],s:'毎日日本語を勉強します。',t:'I study Japanese every day.'}
   ];
-  var card=document.getElementById('heroCard'), dots=[].slice.call(document.querySelectorAll('#dots i')), i=0, timer=null, hover=false;
-  function fill(c){
-    card.querySelector('[data-f=k]').textContent=c.k;
-    card.querySelector('[data-f=r]').textContent=c.r;
-    card.querySelector('[data-f=m]').textContent=c.m;
-    card.querySelector('[data-f=on]').textContent=c.on;
-    card.querySelector('[data-f=kun]').textContent=c.kun;
-    card.querySelector('[data-f=s]').textContent=c.s;
-    card.querySelector('[data-f=t]').textContent=c.t;
-    card.querySelector('[data-f=ex]').innerHTML=c.ex.map(function(e){return '<li><span class="w">'+e[0]+'</span><span class="y">'+e[1]+'</span><span class="e">'+e[2]+'</span></li>';}).join('');
+  var deckEl=document.getElementById('heroDeck'), dots=[].slice.call(document.querySelectorAll('#dots i'));
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function cardHTML(c){
+    return '<div class="flip">'+
+      '<div class="face front"><div><div class="k">'+c.k+'</div><div class="r">'+c.r+'</div></div><div class="tap">Tap to flip</div></div>'+
+      '<div class="face back"><div><span class="m">'+esc(c.m)+'</span><span class="lv">N5</span></div>'+
+      '<div class="row"><b>音</b>'+c.on+'</div><div class="row"><b>訓</b>'+c.kun+'</div>'+
+      '<ul>'+c.ex.map(function(e){return '<li><span class="w">'+e[0]+'</span><span class="y">'+e[1]+'</span><span class="e">'+esc(e[2])+'</span></li>';}).join('')+'</ul>'+
+      '<div class="sent"><span>'+c.s+'</span><small>'+esc(c.t)+'</small></div></div></div>';
   }
-  function mark(){dots.forEach(function(d,n){d.className=n===i?'on':'';});}
-  fill(deck[0]);
-  card.addEventListener('click',function(){card.classList.toggle('is-flipped');restart();});
-  card.addEventListener('mouseenter',function(){hover=true;});
-  card.addEventListener('mouseleave',function(){hover=false;});
-  function step(){
-    if(hover||document.hidden) return;
-    if(!card.classList.contains('is-flipped')){ card.classList.add('is-flipped'); return; }
-    card.classList.remove('is-flipped');
-    setTimeout(function(){ i=(i+1)%deck.length; fill(deck[i]); mark(); }, 450);
+  deckEl.innerHTML='';
+  var slots=deck.map(function(c){var s=document.createElement('div');s.innerHTML=cardHTML(c);s.className='slot';deckEl.appendChild(s);return s;});
+  var order=deck.map(function(_,n){return n;}), busy=false, hover=false, timer=null;
+  function layout(){
+    order.forEach(function(ci,pos){slots[ci].className='slot p'+pos;});
+    dots.forEach(function(d,n){d.className=n===order[0]?'on':'';});
   }
-  function restart(){ clearInterval(timer); if(!reduce) timer=setInterval(step,3600); }
-  restart();
+  function topFlip(){return slots[order[0]].firstElementChild;}
+  function toss(){
+    var s=slots[order[0]];
+    s.className='slot toss';                       // slides off the top of the stack
+    setTimeout(function(){
+      order.push(order.shift());                   // goes to the back, the rest move up
+      layout();
+      setTimeout(function(){busy=false;},650);
+    },520);
+  }
+  // One step: front -> back, or back -> front -> toss to the bottom of the stack.
+  function advance(){
+    if(busy) return 600;
+    var t=topFlip();
+    if(!t.classList.contains('is-flipped')){ t.classList.add('is-flipped'); return 3800; }
+    busy=true;
+    t.classList.remove('is-flipped');
+    setTimeout(toss,900);                          // wait for the flip back to finish
+    return 5000;
+  }
+  function schedule(delay){
+    clearTimeout(timer);
+    if(reduce) return;
+    timer=setTimeout(function(){
+      if(hover||document.hidden||busy){ schedule(600); return; }
+      schedule(advance());
+    },delay);
+  }
+  layout();
+  deckEl.addEventListener('click',function(){ schedule(advance()); });
+  deckEl.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); schedule(advance()); } });
+  deckEl.addEventListener('mouseenter',function(){hover=true;});
+  deckEl.addEventListener('mouseleave',function(){hover=false;});
+  deckEl.addEventListener('focus',function(){hover=true;});
+  deckEl.addEventListener('blur',function(){hover=false;});
+  schedule(3200);
 
   var st=document.getElementById('standCard');
   st.addEventListener('click',function(){st.classList.toggle('is-flipped');});
